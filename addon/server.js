@@ -2,6 +2,7 @@ import Ember from 'ember';
 import { pluralize } from './utils/inflector';
 import Pretender from 'pretender';
 import Db from './db';
+import Factory from './factory';
 import frontController from './controllers/front';
 
 /*
@@ -75,59 +76,17 @@ export default function(options) {
   this.pretender = this.interceptor; // alias
 
   /*
-    Db methods and props
+    The server's database
   */
   this.db = new Db();
-  //this.loadData = function(data) {
-    //this.db.loadData(data);
-  //};
-  //this.emptyDb = function() {
-    //this.db.emptyData();
-  //};
 
   /*
-    Factory methods and props
+    The server's factories and aliases
   */
-  this.loadFactories = function(factoryMap) {
-    var _this = this;
-    // Store a reference to the factories
-    this._factoryMap = factoryMap;
-
-    // Create a collection for each factory
-    Ember.keys(factoryMap).forEach(function(type) {
-      _this.db.createCollection(pluralize(type));
-    });
-  };
-
-  this.create = function(type, overrides) {
-    var collection = pluralize(type);
-    var currentRecords = this.db[collection];
-    var sequence = currentRecords ? currentRecords.length: 0;
-    if (!this._factoryMap || !this._factoryMap[type]) {
-      throw "You're trying to create a " + type + ", but no factory for this type was found";
-    }
-    var OriginalFactory = this._factoryMap[type];
-    var Factory = OriginalFactory.extend(overrides);
-    var factory = new Factory();
-
-    var attrs = factory.build(sequence);
-    // if (overrides) {
-    //   Ember.keys(overrides).forEach(function(key) {
-    //     attrs[key] = overrides[key];
-    //   });
-    // }
-    return this.db[collection].insert(attrs);
-  };
-
-  this.createList = function(type, amount, overrides) {
-    var list = [];
-
-    for (var i = 0; i < amount; i++) {
-      list.push(this.create(type, overrides));
-    }
-
-    return list;
-  };
+  this.factoryManager = new FactoryManager();
+  this.loadFactories = this.factoryManager.loadFactories;
+  this.create = this.factoryManager.create;
+  this.createList = this.factoryManager.createList;
 
   // TODO: Better way to inject server
   if (environment === 'test') {
