@@ -1,5 +1,7 @@
-import Ember from 'ember';
 /* global jQuery */
+import Ember from 'ember';
+import Sequence from './attributes/sequence';
+import Lazy from './attributes/lazy';
 
 var Factory = function() {
 
@@ -14,16 +16,24 @@ var Factory = function() {
       var attr = attrs[key];
       var type = typeof attr;
 
-      if (type === 'object') {
-        //object[key] = attrs[key].call(attrs, _this._sequence++);
-        //object[key] = attrs[key].evaluate(_this._sequence++);
+      switch (attr.constructor) {
+        case Sequence:
+          attr.factory = _this;
+          object[key] = attr.evaluate();
+          break;
 
-        //debugger;
-        attr.factory = _this;
-        //var attr = new attrs[key](this);
-        object[key] = attr.evaluate();
-      } else {
-        object[key] = attrs[key];
+        case Lazy:
+          attr.factory = _this;
+          object[key] = attr.evaluate();
+          break;
+
+        case Function:
+          object[key] = attr.call(attrs);
+          break;
+
+        default:
+          object[key] = attr;
+          break;
       }
     });
 

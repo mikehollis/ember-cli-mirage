@@ -36,6 +36,26 @@ test('it works with strings, numbers and booleans', function() {
   deepEqual(data, {name: 'Sam', age: 28, alive: true});
 });
 
+test('it supports inheritance', function() {
+  var PersonFactory = Mirage.Factory.extend({
+    species: 'human'
+  });
+  var ManFactory = PersonFactory.extend({
+    gender: 'male'
+  });
+  var SamFactory = ManFactory.extend({
+    name: 'Sam'
+  });
+
+  var p = new PersonFactory();
+  var m = new ManFactory();
+  var s = new SamFactory();
+
+  deepEqual(p.build(), {species: 'human'});
+  deepEqual(m.build(), {species: 'human', gender: 'male'});
+  deepEqual(s.build(), {species: 'human', gender: 'male', name: 'Sam'});
+});
+
 test('it can use sequences', function() {
   var PostFactory = Mirage.Factory.extend({
     likes: Mirage.sequence(i => 5*i)
@@ -63,41 +83,22 @@ test('it can lazily calculate expressions ', function() {
   deepEqual(obj, {value: 2});
 });
 
-test('it can lazily calculate expressions that depend on other attrs', function() {
-  var Factory = Mirage.Factory.extend({
-    index: Mirage.sequence(i => 2*i),
-    value: Mirage.lazy('index', (index) => {
-      return index + 1;
-    })
-  });
-  var factory = new Factory();
+// test('it can lazily calculate expressions that depend on other attrs', function() {
+//   var Factory = Mirage.Factory.extend({
+//     first_name: Mirage.sequence(i => `Person${i}`),
+//     last_name: 'Smith',
+//     email: Mirage.lazy('first_name', 'last_name', (firstName, lastName) => {
+//       return `${firstName}.${lastName}@gmail.com`;
+//     })
+//   });
+//   var factory = new Factory();
 
-  var obj1 = factory.build();
-  var obj2 = factory.build();
+//   var obj1 = factory.build();
+//   var obj2 = factory.build();
 
-  deepEqual(obj1, {index: 2, value: 3});
-  deepEqual(obj2, {index: 4, value: 5});
-});
-
-//test('it supports inheritance', function() {
-  //var PersonFactory = Factory.extend({
-    //species: 'human'
-  //});
-  //var ManFactory = PersonFactory.extend({
-    //gender: 'male'
-  //});
-  //var SamFactory = ManFactory.extend({
-    //name: 'Sam'
-  //});
-
-  //var p = new PersonFactory();
-  //var m = new ManFactory();
-  //var s = new SamFactory();
-
-  //deepEqual(p.build(), {species: 'human'});
-  //deepEqual(m.build(), {species: 'human', gender: 'male'});
-  //deepEqual(s.build(), {species: 'human', gender: 'male', name: 'Sam'});
-//});
+//   deepEqual(obj1, {first_name: 'Person1', last_name: 'Smith', email: 'Person1.Smith@gmail.com'});
+//   deepEqual(obj2, {first_name: 'Person2', last_name: 'Smith', email: 'Person2.Smith@gmail.com'});
+// });
 
 ////test('it supports associations', function() {
   ////var UserFactory = Factory.extend({
