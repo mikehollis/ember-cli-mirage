@@ -27,8 +27,9 @@ var Factory = function() {
           object[key] = attr.evaluate();
           break;
 
+        // for backwards compat
         case Function:
-          object[key] = attr.call(attrs);
+          object[key] = attr.call(attrs, _this._sequence);
           break;
 
         default:

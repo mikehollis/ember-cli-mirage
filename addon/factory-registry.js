@@ -4,63 +4,73 @@ import Ember from 'ember';
  * This object loads factory definitions and builds objects
  * using them.
 */
-export default function() {
-  this.register = function(name, definition) {
-    this._registry[name] = definition;
+export default function(db) {
+
+  this.db = db;
+
+  this.register = function(name, factory) {
+    this._registry[name] = factory;
   };
 
-  this.loadDefinitions = function(factoryMap) {
-    var _this = this;
-    // Store a reference to the factories
-    this._factoryMap = factoryMap;
+  // this.register = function(name, factory) {
+  // };
 
-    // Create a collection for each factory
-    Ember.keys(factoryMap).forEach(function(type) {
-      _this.db.createCollection(pluralize(type));
-    });
-  };
+  // this.loadDefinitions = function(factoryMap) {
+  //   var _this = this;
+  //   // Store a reference to the factories
+  //   this._factoryMap = factoryMap;
 
-  this.build = function(type, overrides) {
-    var object = {};
+  //   // Create a collection for each factory
+  //   Ember.keys(factoryMap).forEach(function(type) {
+  //     _this.db.createCollection(pluralize(type));
+  //   });
+  // };
 
-    if (!this._registry[type]) {
+  // this.create = function(type) {
+
+  // };
+
+  // this.build = function(type, overrides) {
+  //   var object = {};
+
+  //   if (!this._registry[type]) {
+  //     throw "You're trying to create a " + type + ", but no factory for this type was found";
+  //   }
+
+  //   var attrs = this._getAttrsForType(type);
+  //   Ember.keys(attrs).forEach(function(key) {
+  //     var type = typeof attrs[key];
+
+  //     if (type === 'function') {
+  //       object[key] = attrs[key].call(attrs, sequence);
+  //     } else {
+  //       object[key] = attrs[key];
+  //     }
+  //   });
+
+  //   return object;
+  // };
+
+  this.create = function(type, overrides) {
+    if (!this._registry || !this._registry[type]) {
       throw "You're trying to create a " + type + ", but no factory for this type was found";
     }
+    var OriginalFactory = this._registry[type];
+    var Factory = OriginalFactory.extend(overrides);
+    var factory = new Factory();
 
-    var attrs = this._getAttrsForType(type);
-    Ember.keys(attrs).forEach(function(key) {
-      var type = typeof attrs[key];
-
-      if (type === 'function') {
-        object[key] = attrs[key].call(attrs, sequence);
-      } else {
-        object[key] = attrs[key];
-      }
-    });
-
-    return object;
+    var attrs = factory.build();
+    // if (overrides) {
+    //   Ember.keys(overrides).forEach(function(key) {
+    //     attrs[key] = overrides[key];
+    //   });
+    // }
+    var collection = pluralize(type);
+    if (!this.db[collection]) {
+      db.createCollection(collection);
+    }
+    return this.db[collection].insert(attrs);
   };
-
-  // This belongs on the server
-  //this.create = function(type, overrides) {
-    //var collection = pluralize(type);
-    //var currentRecords = this.db[collection];
-    //var sequence = currentRecords ? currentRecords.length: 0;
-    //if (!this._factoryMap || !this._factoryMap[type]) {
-      //throw "You're trying to create a " + type + ", but no factory for this type was found";
-    //}
-    //var OriginalFactory = this._factoryMap[type];
-    //var Factory = OriginalFactory.extend(overrides);
-    //var factory = new Factory();
-
-    //var attrs = factory.build(sequence);
-    //// if (overrides) {
-    ////   Ember.keys(overrides).forEach(function(key) {
-    ////     attrs[key] = overrides[key];
-    ////   });
-    //// }
-    //return this.db[collection].insert(attrs);
-  //};
 
   //this.createList = function(type, amount, overrides) {
     //var list = [];

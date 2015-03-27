@@ -100,19 +100,18 @@ test('it can lazily calculate expressions ', function() {
 //   deepEqual(obj2, {first_name: 'Person2', last_name: 'Smith', email: 'Person2.Smith@gmail.com'});
 // });
 
-////test('it supports associations', function() {
-  ////var UserFactory = Factory.extend({
-    ////name: function(i) {
-      ////return "Person " + i;
-    ////},
-    ////addresses: hasMany(AddressFactory)
-    ////hasMany: 'addresses'
-  ////});
+// test('it supports one to one associations', function() {
+//   var UserFactory = Mirage.Factory.extend({
+//     name: 'Sam',
+//     address: Mirage.hasOne('address')
+//   });
 
-  ////var AddressFactory = Factory.extend({
-    ////street: function(i) {
-      ////return i + ' st.';
-    ////}
-  ////});
-////});
+//   var AddressFactory = Mirage.Factory.extend({
+//     street: '123 Way',
+//     city: 'Hyrule',
+//     state: 'FL',
+//     zip: '12345',
+//     user: Mirage.belongsTo('user')
+//   });
+// });
 
