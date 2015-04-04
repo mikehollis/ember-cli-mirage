@@ -1,6 +1,7 @@
 export default function() {
   // Contacts
   this.get('/contacts');
+  this.get('/contacts', ['contacts', 'addresses']);
   this.get('/contacts/:id');
   this.post('/contacts');
   this.put('/contacts/:id');

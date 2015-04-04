@@ -4,9 +4,10 @@ import Ember from 'ember';
  * This object loads factory definitions and builds objects
  * using them.
 */
-export default function(db) {
+export default function(db, modelRegistry) {
 
   this.db = db;
+  this.modelRegistry = modelRegistry;
 
   this.register = function(name, factory) {
     this._registry[name] = factory;
