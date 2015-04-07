@@ -45,7 +45,7 @@ export default function() {
 
   this._insert = function(collection, data) {
     var _this = this;
-    var copy = JSON.parse(JSON.stringify(data));
+    var copy = data ? JSON.parse(JSON.stringify(data)) : {};
     var returnData;
 
     if (!Ember.isArray(copy)) {
