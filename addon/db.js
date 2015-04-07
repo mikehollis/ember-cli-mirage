@@ -78,6 +78,8 @@ export default function() {
     if (Ember.isArray(ids)) {
       return ids.map(function(id) {
         return _this._findRecordForId(collection, id);
+      }).filter(function(record) {
+        return record !== undefined;
       });
 
     } else {
