@@ -63,7 +63,7 @@ export default function(db) {
 
   this._find = function(type, ids) {
     var collection = pluralize(type);
-    if (!db[collection]) {
+    if (db[collection]) {
       return null;
     }
     var attrs = db[collection].find(ids);
