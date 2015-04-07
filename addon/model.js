@@ -5,9 +5,9 @@ var Model = function(attrs) {
 
   this.attrs = attrs;
 
-  Object.keys(attrs).forEach(function(attr) {
-    _this[attr] = attrs[attr];
-  });
+  //Object.keys(attrs).forEach(function(attr) {
+    //_this[attr] = attrs[attr];
+  //});
 };
 
 Model.extend = extend;
