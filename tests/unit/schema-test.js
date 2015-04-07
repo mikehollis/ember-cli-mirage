@@ -9,6 +9,12 @@ test('it can be instantiated', function(assert) {
   assert.ok(schema);
 });
 
+test('it cannot be instantiated without a db', function(assert) {
+  assert.throws(function() {
+    var schema = new Schema();
+  });
+});
+
 test('it can create registered models', function(assert) {
   var schema = new Schema(new Db());
 
@@ -22,7 +28,7 @@ test('it can create registered models', function(assert) {
   assert.deepEqual(user.attrs, {id: 1, name: 'Link'});
 });
 
-test('it cannot create models that havnet been registered', function(assert) {
+test('it cannot create models that havent been registered', function(assert) {
   var schema = new Schema(new Db());
 
   assert.throws(function() {
@@ -88,5 +94,31 @@ test('it can find multiple models by ids', function(assert) {
   assert.ok(users[0] instanceof User);
   assert.equal(users.length, 2);
   assert.deepEqual(users[1].attrs, {id: 2, name: 'Zelda'});
+});
+
+test('it returns null if no model is found for an id', function(assert) {
+  var db = new Db();
+  db.createCollection('users');
+  var schema = new Schema(db);
+
+  var User = Model.extend();
+  schema.register('user', User);
+
+  var user = schema.user.find(1);
+
+  assert.equal(user, null);
+});
+
+test('it returns an empty array if no model is found for an array of ids', function(assert) {
+  var db = new Db();
+  db.createCollection('users');
+  var schema = new Schema(db);
+
+  var User = Model.extend();
+  schema.register('user', User);
+
+  var users = schema.user.find([1, 2]);
+
+  assert.deepEqual(users, []);
 });
 

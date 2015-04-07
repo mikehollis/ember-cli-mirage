@@ -17,6 +17,10 @@ import { pluralize } from './utils/inflector';
 
 export default function(db) {
 
+  if (!db) {
+    throw 'Mirage: A schema requires a db';
+  }
+
   this.db = db;
   this._registry = {};
 
@@ -63,13 +67,21 @@ export default function(db) {
 
   this._find = function(type, ids) {
     var collection = pluralize(type);
-    if (db[collection]) {
+    if (!db[collection]) {
       return null;
     }
-    var attrs = db[collection].find(ids);
-    var ModelClass = this._registry[type];
 
-    return new ModelClass(attrs);
+    var ModelClass = this._registry[type];
+    var records = db[collection].find(ids);
+
+    if (Ember.isArray(ids)) {
+      return !records ? [] : records.map(function(record) {
+        return new ModelClass(record);
+      });
+
+    } else {
+      return !records ? null : new ModelClass(records);
+    }
   }
 
 
